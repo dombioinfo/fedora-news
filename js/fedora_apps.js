@@ -53,7 +53,6 @@ var get_fedmsg_msg = function(category, callback) {
 function parse_fedmsg(entry, id) {
     var content = null;
     var date = new Date(entry.timestamp * 1000).toLocaleString();
-    console.log(entry);
 	switch(id) {
 		case 'planet':
 			content = '<div data-role="collapsible"> '
@@ -106,7 +105,6 @@ function load_fedmsg(id, category) {
     $("#content_" + id).html('');
     entries = localStorage.getItem(id) ? localStorage.getItem(id) : [];
     entries = eval(entries);
-//    console.log(entries);
     if (entries == null || entries.length == 0) {
         update_fedmsg(id, category);
     } else {
@@ -139,7 +137,6 @@ function update_fedmsg(id, category, deploy) {
     $("#content_" + id).html('');
 
     get_fedmsg_msg(category, function(data, category) {
-//        console.log("Get fedmsg: " + category);
         
         if (!data || data.total == 0) {
             $("#message_" + id).text('Could not retrieve information from fedmsg');
@@ -164,7 +161,6 @@ function update_fedmsg(id, category, deploy) {
 }
 
 function setup_websocket_listener() {
-//    console.log("setup_websocket_listener");
     socket = new WebSocket("wss://hub.fedoraproject.org:9939");
 
     socket.onopen = function(e){
@@ -173,14 +169,11 @@ function setup_websocket_listener() {
     };
     socket.onerror = function(e){socket=null;};
     socket.onclose = function(e){
-//        console.log("onclose");
-//        socket=null;
         setup_websocket_listener();
     };
 
     // Our main callback
     socket.onmessage = function(e){
-//        console.log("onmessage");
         var data, json, topic, body, tokens, category, page_id, deploy, id_lookup;
 
         // Build a handy mapping of fedmsg categories to CSS ids.
@@ -189,7 +182,7 @@ function setup_websocket_listener() {
             buildsys: "builds",
             pkgdb: "packages",
             planet: "planet",
-			meetings: "meetings"
+			fedocal: "meetings"
         }
 
         // Parse and extract the category from the websocket message.
@@ -216,7 +209,6 @@ function setup_websocket_listener() {
         update_fedmsg(id_lookup[category], category, deploy);
         
         // Add blink effect on page's title to alert user of new post
-        // Note: this code is adapted from canop's blog (canop.org)
         var originalTitle = document.title;
         var visibility = (function(){
             var stateKey, eventKey, keys = {
